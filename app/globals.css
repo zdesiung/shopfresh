@@ -6,6 +6,14 @@
   --background: #ffffff;
   --foreground: #171717;
 }
+.logo-image {
+  filter: invert(23%) sepia(27%) saturate(5671%) hue-rotate(184deg) brightness(94%) contrast(93%);
+}
+
+a {
+  color: black; /* or any other color you want */
+}
+
 
 @media (prefers-color-scheme: dark) {
   :root {

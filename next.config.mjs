@@ -1,4 +1,11 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  images: {
+    domains: [
+      'h2rsi9anqnqbkvkf.public.blob.vercel-storage.com', 
+      'hebbkx1anhila5yf.public.blob.vercel-storage.com'
+    ], // Agrega aquí los dominios permitidos
+  },
+};
 
 export default nextConfig;
