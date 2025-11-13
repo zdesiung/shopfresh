@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import FeaturedProducts from "@/components/ui/FeaturedProducts";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -11,8 +10,6 @@ import {
   User,
   ChevronLeft,
   ChevronRight,
-  Menu,
-  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import {
@@ -35,42 +32,8 @@ const carouselImages = [
 // 📱 WhatsApp
 const whatsappLink = "https://wa.me/+51968108836";
 
-// 🛍️ Productos
-const productos = [
-  {
-    id: 1,
-    name: "Polo Clásico",
-    price: "S/ 199.99",
-    image:
-      "https://h2rsi9anqnqbkvkf.public.blob.vercel-storage.com/wxF7GEC-cZLxxpQYk9LRPvY2UYhRdB1RM76oyu.jpeg",
-  },
-  {
-    id: 2,
-    name: "Polo Manga",
-    price: "S/ 249.99",
-    image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/desing-fDxzIq8g3A5ZyZ3hOF20E2yls7A5mt.png",
-  },
-  {
-    id: 3,
-    name: "Polo Marinero",
-    price: "S/ 179.99",
-    image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/barco%20pirata-UDDQR7TFaLxYs32A7x5BCs8jP2BOEi.png",
-  },
-  {
-    id: 4,
-    name: "Polo Cobra",
-    price: "S/ 299.99",
-    image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/cobra-fJr0J6folMdn0Zz6thWoOvmZq6zYtx.png",
-  },
-  // ... (mantienes los demás productos)
-];
-
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   // 🔁 Auto cambio del carrusel
   useEffect(() => {
@@ -104,18 +67,15 @@ export default function Home() {
       {/* 🧭 Navbar */}
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
-          {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <Image
-              src="/images/logo.png"
+               src="/images/logo.png"
               width={32}
               height={32}
               alt="Logo FreshDesign"
             />
             <span className="text-xl font-bold text-gray-800">FreshDesign</span>
           </Link>
-
-          {/* Menú escritorio */}
           <div className="hidden sm:flex space-x-8">
             {["Tienda", "Nosotros", "Contacto"].map((item) => (
               <Link
@@ -127,8 +87,6 @@ export default function Home() {
               </Link>
             ))}
           </div>
-
-          {/* Iconos */}
           <div className="hidden sm:flex items-center space-x-2">
             {[ShoppingCart, Heart, User].map((Icon, i) => (
               <Button
@@ -141,60 +99,10 @@ export default function Home() {
               </Button>
             ))}
           </div>
-
-          {/* Botón menú móvil */}
-          <button
-            className="sm:hidden p-2 text-gray-700 hover:text-black"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            {menuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </button>
         </div>
-
-        {/* Menú desplegable móvil */}
-        <AnimatePresence>
-          {menuOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="sm:hidden bg-white border-t shadow-md"
-            >
-              <div className="flex flex-col space-y-3 px-6 py-4">
-                {["Tienda", "Nosotros", "Contacto"].map((item) => (
-                  <Link
-                    key={item}
-                    href={`/${item.toLowerCase()}`}
-                    className="text-gray-700 hover:text-black text-base font-medium"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {item}
-                  </Link>
-                ))}
-                <div className="flex space-x-3 pt-3 border-t">
-                  {[ShoppingCart, Heart, User].map((Icon, i) => (
-                    <Button
-                      key={i}
-                      variant="ghost"
-                      size="icon"
-                      aria-label={Icon.name}
-                      className="text-gray-700"
-                    >
-                      <Icon className="h-5 w-5" />
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </nav>
 
-      {/* 🎞️ Carrusel */}
+      {/* 🎞️ Carrusel animado */}
       <section className="relative h-[600px] overflow-hidden bg-black">
         <AnimatePresence mode="wait">
           <motion.div
@@ -215,25 +123,41 @@ export default function Home() {
           </motion.div>
         </AnimatePresence>
 
-        {/* Texto animado */}
+        {/* Texto con animación */}
         <motion.div
           initial="hidden"
           animate="visible"
           variants={textVariants}
           className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center px-4"
         >
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 drop-shadow-lg">
-            Bienvenido a FreshDesign
-          </h1>
-          <p className="text-lg md:text-xl text-gray-200 mb-6">
-            Descubre nuestra última colección de polos premium
-          </p>
-          <Button
-            size="lg"
-            className="bg-white text-black hover:bg-gray-100 transition-transform hover:scale-105"
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 1 }}
+            className="text-4xl md:text-5xl font-extrabold text-white mb-4 drop-shadow-lg"
           >
-            Comprar Ahora
-          </Button>
+            Bienvenido a FreshDesign
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.9 }}
+            className="text-lg md:text-xl text-gray-200 mb-6"
+          >
+            Descubre nuestra última colección de polos premium
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 1.1, duration: 0.8 }}
+          >
+            <Button
+              size="lg"
+              className="bg-white text-black hover:bg-gray-100 transition-transform hover:scale-105"
+            >
+              Comprar Ahora
+            </Button>
+          </motion.div>
         </motion.div>
 
         {/* Botones de control */}
@@ -257,30 +181,53 @@ export default function Home() {
         </Button>
       </section>
 
-      {/* 🛒 Productos */}
-      <FeaturedProducts productos={productos} />
-
-      {/* ✉️ Newsletter */}
-      <section className="bg-blue-600 py-16 text-center">
-        <div className="max-w-3xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-white mb-3">
-            Suscríbete a Nuestro Boletín
-          </h2>
-          <p className="text-gray-200 mb-6">
-            Recibe las últimas actualizaciones sobre nuevos productos y
-            promociones exclusivas.
+      {/* 📍 Sección de Contacto */}
+      <section className="bg-gray-100 py-20 px-6 text-center">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-4xl font-bold text-gray-800 mb-6">Contáctanos</h2>
+          <p className="text-gray-600 mb-10 max-w-2xl mx-auto">
+            Si deseas comunicarte con nosotros, puedes visitarnos o escribirnos
+            directamente. ¡Estaremos encantados de atenderte!
           </p>
-          <form className="flex max-w-md mx-auto rounded-md overflow-hidden">
-            <input
-              type="email"
-              placeholder="Tu correo electrónico"
-              className="flex-grow px-4 py-3 text-gray-800 focus:outline-none"
-              required
-            />
-            <Button type="submit" className="rounded-none">
-              Suscribirse
-            </Button>
-          </form>
+
+          <div className="grid md:grid-cols-2 gap-10 items-center">
+            <div className="text-left space-y-4">
+              <p className="text-lg text-gray-700">
+                📍 <strong>Dirección:</strong> Lima, Perú — Distrito de Ate
+                Vitarte
+              </p>
+              <p className="text-lg text-gray-700">
+                📞 <strong>Teléfono:</strong> +51 968 108 836
+              </p>
+              <p className="text-lg text-gray-700">
+                ✉️ <strong>Email:</strong> contacto@freshdesign.pe
+              </p>
+              <div className="flex space-x-4 mt-4">
+                {[FaFacebookF, FaInstagram, FaYoutube, FaTiktok].map(
+                  (Icon, i) => (
+                    <a
+                      key={i}
+                      href="#"
+                      className="p-3 bg-gray-800 text-white rounded-full hover:bg-blue-600 transition"
+                    >
+                      <Icon className="w-5 h-5" />
+                    </a>
+                  ),
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-xl overflow-hidden shadow-lg">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3900.813682663027!2d-76.947342!3d-12.015232!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c65b2f2e9e6d%3A0x3d373f89aafc774!2sAte%20Vitarte%2C%20Lima%2C%20Per%C3%BA!5e0!3m2!1ses!2spe!4v1697472189284!5m2!1ses!2spe"
+                width="100%"
+                height="350"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+          </div>
         </div>
       </section>
 

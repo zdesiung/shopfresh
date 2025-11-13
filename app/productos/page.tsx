@@ -11,8 +11,6 @@ import {
   User,
   ChevronLeft,
   ChevronRight,
-  Menu,
-  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import {
@@ -65,12 +63,10 @@ const productos = [
     image:
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/cobra-fJr0J6folMdn0Zz6thWoOvmZq6zYtx.png",
   },
-  // ... (mantienes los demás productos)
 ];
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   // 🔁 Auto cambio del carrusel
   useEffect(() => {
@@ -84,7 +80,7 @@ export default function Home() {
     setCurrentSlide((prev) => (prev + 1) % carouselImages.length);
   const prevSlide = () =>
     setCurrentSlide(
-      (prev) => (prev - 1 + carouselImages.length) % carouselImages.length,
+      (prev) => (prev - 1 + carouselImages.length) % carouselImages.length
     );
 
   // 🎬 Variantes de animación
@@ -104,18 +100,16 @@ export default function Home() {
       {/* 🧭 Navbar */}
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
-          {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <Image
               src="/images/logo.png"
               width={32}
               height={32}
               alt="Logo FreshDesign"
+              priority
             />
             <span className="text-xl font-bold text-gray-800">FreshDesign</span>
           </Link>
-
-          {/* Menú escritorio */}
           <div className="hidden sm:flex space-x-8">
             {["Tienda", "Nosotros", "Contacto"].map((item) => (
               <Link
@@ -127,74 +121,17 @@ export default function Home() {
               </Link>
             ))}
           </div>
-
-          {/* Iconos */}
           <div className="hidden sm:flex items-center space-x-2">
             {[ShoppingCart, Heart, User].map((Icon, i) => (
-              <Button
-                key={i}
-                variant="ghost"
-                size="icon"
-                aria-label={Icon.name}
-              >
+              <Button key={i} variant="ghost" size="icon" aria-label={Icon.name}>
                 <Icon className="h-5 w-5 text-gray-700" />
               </Button>
             ))}
           </div>
-
-          {/* Botón menú móvil */}
-          <button
-            className="sm:hidden p-2 text-gray-700 hover:text-black"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            {menuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </button>
         </div>
-
-        {/* Menú desplegable móvil */}
-        <AnimatePresence>
-          {menuOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="sm:hidden bg-white border-t shadow-md"
-            >
-              <div className="flex flex-col space-y-3 px-6 py-4">
-                {["Tienda", "Nosotros", "Contacto"].map((item) => (
-                  <Link
-                    key={item}
-                    href={`/${item.toLowerCase()}`}
-                    className="text-gray-700 hover:text-black text-base font-medium"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {item}
-                  </Link>
-                ))}
-                <div className="flex space-x-3 pt-3 border-t">
-                  {[ShoppingCart, Heart, User].map((Icon, i) => (
-                    <Button
-                      key={i}
-                      variant="ghost"
-                      size="icon"
-                      aria-label={Icon.name}
-                      className="text-gray-700"
-                    >
-                      <Icon className="h-5 w-5" />
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </nav>
 
-      {/* 🎞️ Carrusel */}
+      {/* 🎞️ Carrusel animado */}
       <section className="relative h-[600px] overflow-hidden bg-black">
         <AnimatePresence mode="wait">
           <motion.div
@@ -215,25 +152,41 @@ export default function Home() {
           </motion.div>
         </AnimatePresence>
 
-        {/* Texto animado */}
+        {/* Texto con animación */}
         <motion.div
           initial="hidden"
           animate="visible"
           variants={textVariants}
           className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center px-4"
         >
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 drop-shadow-lg">
-            Bienvenido a FreshDesign
-          </h1>
-          <p className="text-lg md:text-xl text-gray-200 mb-6">
-            Descubre nuestra última colección de polos premium
-          </p>
-          <Button
-            size="lg"
-            className="bg-white text-black hover:bg-gray-100 transition-transform hover:scale-105"
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 1 }}
+            className="text-4xl md:text-5xl font-extrabold text-white mb-4 drop-shadow-lg"
           >
-            Comprar Ahora
-          </Button>
+            Bienvenido a FreshDesign
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.9 }}
+            className="text-lg md:text-xl text-gray-200 mb-6"
+          >
+            Descubre nuestra última colección de polos premium
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 1.1, duration: 0.8 }}
+          >
+            <Button
+              size="lg"
+              className="bg-white text-black hover:bg-gray-100 transition-transform hover:scale-105"
+            >
+              Comprar Ahora
+            </Button>
+          </motion.div>
         </motion.div>
 
         {/* Botones de control */}
@@ -310,35 +263,30 @@ export default function Home() {
                       {link}
                     </Link>
                   </li>
-                ),
+                )
               )}
             </ul>
           </div>
           <div>
             <h3 className="text-white text-lg font-semibold mb-4">Síguenos</h3>
             <div className="flex space-x-3">
-              {[
-                FaFacebookF,
-                FaYoutube,
-                FaInstagram,
-                FiX,
-                FaPinterestP,
-                FaTiktok,
-              ].map((Icon, i) => (
-                <Link
-                  key={i}
-                  href="#"
-                  className="bg-black/40 p-3 rounded-full hover:bg-blue-500 transition"
-                >
-                  <Icon className="text-white w-5 h-5" />
-                </Link>
-              ))}
+              {[FaFacebookF, FaYoutube, FaInstagram, FiX, FaPinterestP, FaTiktok].map(
+                (Icon, i) => (
+                  <Link
+                    key={i}
+                    href="#"
+                    className="bg-black/40 p-3 rounded-full hover:bg-blue-500 transition"
+                  >
+                    <Icon className="text-white w-5 h-5" />
+                  </Link>
+                )
+              )}
             </div>
           </div>
         </div>
       </footer>
 
-      {/* 💬 Botón WhatsApp */}
+      {/* 💬 Botón WhatsApp con vibración */}
       <motion.a
         href={whatsappLink}
         target="_blank"

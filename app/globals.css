@@ -7,13 +7,13 @@
   --foreground: #171717;
 }
 .logo-image {
-  filter: invert(23%) sepia(27%) saturate(5671%) hue-rotate(184deg) brightness(94%) contrast(93%);
+  filter: invert(23%) sepia(27%) saturate(5671%) hue-rotate(184deg)
+    brightness(94%) contrast(93%);
 }
 
 a {
   color: black; /* or any other color you want */
 }
-
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -32,4 +32,32 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* styles/globals.css o un archivo CSS específico */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.product-card {
+  animation: fadeIn 0.5s ease-in-out;
+}
+/* components/WhatsAppButton.module.css */
+.button {
+  display: flex;
+  align-items: center;
+  background-color: #25d366;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 16px;
 }
