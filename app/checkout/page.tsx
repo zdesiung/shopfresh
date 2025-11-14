@@ -5,9 +5,12 @@ import Image from "next/image";
 import { useCart } from "@/components/cart/CartContext";
 import { generateQRCode } from "../lib/payments";
 
+const paymentMethods = ["card", "yape", "plin"] as const;
+type PaymentMethod = typeof paymentMethods[number];
+
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
-  const [method, setMethod] = useState<"card" | "yape" | "plin">("card");
+  const [method, setMethod] = useState<PaymentMethod>("card");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
@@ -36,17 +39,17 @@ export default function CheckoutPage() {
             body: JSON.stringify({
               email,
               amount: totalPrice,
-              source_id: token,
+              token,
             }),
           });
 
           const data = await res.json();
 
-          if (data.object === "charge") {
+          if (data.success && data.charge) {
             setSuccess(true);
             clearCart();
           } else {
-            alert("Error en el pago");
+            alert(data.message || "Error en el pago");
           }
         }
       };
@@ -139,7 +142,7 @@ export default function CheckoutPage() {
           <h3 className="font-semibold mb-4">Método de pago</h3>
 
           <div className="space-y-2">
-            {(["card", "yape", "plin"] as const).map((m) => (
+            {paymentMethods.map((m) => (
               <label key={m} className="flex items-center gap-2">
                 <input
                   type="radio"

@@ -1,9 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Culqi from "culqi-node";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const { token, amount, email } = await req.json();
+    const { token, amount, email } = await req.json() as {
+      token: string;
+      amount: number;
+      email: string;
+    };
 
     const culqi = new Culqi({
       privateKey: process.env.CULQI_SECRET_KEY || "",
@@ -18,9 +22,10 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ success: true, charge });
-  } catch (error: any) {
+  } catch (error) {
+    console.error("Error Culqi:", error);
     return NextResponse.json(
-      { success: false, message: error?.user_message || "Error al procesar pago" },
+      { success: false, message: (error as any)?.user_message || "Error al procesar pago" },
       { status: 400 }
     );
   }
