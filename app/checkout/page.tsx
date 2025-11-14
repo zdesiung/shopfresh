@@ -1,70 +1,108 @@
 "use client";
-import React, { useState } from "react";
+
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { useCart } from "@/components/cart/CartContext";
-import { payWithCard, generateQRCode } from "../lib/payments";
+import { generateQRCode } from "../lib/payments";
 
 export default function CheckoutPage() {
-  const { cart, total, clearCart } = useCart();
+  const { items, totalPrice, clearCart } = useCart();
   const [method, setMethod] = useState<"card" | "yape" | "plin">("card");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
 
-  // 🧾 Evita continuar si el carrito está vacío
-  if (!cart || cart.length === 0) {
+  // Inicializar Culqi
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      // @ts-ignore
+      window.Culqi.publicKey = process.env.NEXT_PUBLIC_CULQI_PUBLIC_KEY;
+    }
+  }, []);
+
+  // Callback de Culqi
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      // @ts-ignore
+      window.culqi = async () => {
+        // @ts-ignore
+        if (Culqi.token) {
+          const token = Culqi.token.id;
+          const email = Culqi.token.email;
+
+          const res = await fetch("/api/culqi", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email,
+              amount: totalPrice,
+              source_id: token,
+            }),
+          });
+
+          const data = await res.json();
+
+          if (data.object === "charge") {
+            setSuccess(true);
+            clearCart();
+          } else {
+            alert("Error en el pago");
+          }
+        }
+      };
+    }
+  }, [totalPrice, clearCart]);
+
+  const handlePayment = async () => {
+    setLoading(true);
+    setSuccess(false);
+
+    try {
+      if (method === "card") {
+        // @ts-ignore
+        Culqi.settings({
+          title: "Lutex VTop",
+          currency: "PEN",
+          description: "Pago de compra",
+          amount: Math.round(totalPrice * 100),
+        });
+
+        // @ts-ignore
+        Culqi.open();
+        return;
+      }
+
+      const qr = generateQRCode(method, totalPrice);
+      setQrUrl(qr);
+    } catch (error) {
+      console.error("Error procesando pago:", error);
+      alert("Error procesando pago");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!items || items.length === 0) {
     return (
       <div className="p-8 text-center">
         <h2 className="text-2xl font-bold mb-4">🛒 Tu carrito está vacío</h2>
-        <p className="text-gray-600 mb-4">
-          Agrega productos antes de proceder al pago.
-        </p>
-        <a
-          href="/tienda"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
+        <a href="/tienda" className="bg-blue-600 text-white px-4 py-2 rounded">
           Ir a la tienda
         </a>
       </div>
     );
   }
 
-  const handlePayment = async () => {
-    setLoading(true);
-    try {
-      if (method === "card") {
-        // ⚙️ Aquí se integrará Culqi, Stripe, etc.
-        const fakeToken = "tok_test_123"; // token simulado
-        await payWithCard(fakeToken, Math.round(total * 100)); // centavos si la API lo requiere
-      } else {
-        // 📱 Genera QR para Yape o Plin
-        const qr = generateQRCode(method, total);
-        setQrUrl(qr);
-        return; // detener flujo aquí, no marcar como "success" hasta que se confirme
-      }
-
-      // ✅ Pago exitoso
-      setSuccess(true);
-      clearCart();
-    } catch (err: any) {
-      console.error("Error en el pago:", err);
-      alert("Error en el pago: " + (err?.message || "Intenta de nuevo"));
-    } finally {
-      setLoading(false);
-    }
-  };
-
   if (success) {
     return (
       <div className="p-8 text-center">
-        <h2 className="text-2xl font-bold mb-4 text-green-700">
-          ✅ ¡Pago exitoso!
+        <h2 className="text-2xl font-bold text-green-600">
+          ✔ ¡Pago realizado con éxito!
         </h2>
-        <p className="text-gray-700">
-          Gracias por tu compra. Recibirás un correo con la confirmación.
-        </p>
+        <p>Gracias por tu compra.</p>
         <a
           href="/tienda"
-          className="mt-6 inline-block bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
+          className="mt-6 inline-block bg-blue-600 text-white px-5 py-2 rounded"
         >
           Volver a la tienda
         </a>
@@ -77,10 +115,11 @@ export default function CheckoutPage() {
       <h1 className="text-2xl font-bold mb-6">🧾 Checkout</h1>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {/* 🛍️ Resumen de pedido */}
+        {/* Resumen */}
         <div className="bg-white p-4 rounded shadow">
-          <h3 className="font-semibold mb-4">Resumen</h3>
-          {cart.map((item) => (
+          <h3 className="font-semibold mb-4">Resumen del pedido</h3>
+
+          {items.map((item) => (
             <div key={item.id} className="flex justify-between mb-2">
               <span>
                 {item.name} × {item.quantity}
@@ -88,30 +127,30 @@ export default function CheckoutPage() {
               <span>S/ {(item.price * item.quantity).toFixed(2)}</span>
             </div>
           ))}
-          <div className="flex justify-between border-t pt-2 font-bold">
+
+          <div className="border-t pt-2 font-bold flex justify-between">
             <span>Total</span>
-            <span>S/ {total.toFixed(2)}</span>
+            <span>S/ {totalPrice.toFixed(2)}</span>
           </div>
         </div>
 
-        {/* 💳 Métodos de pago */}
+        {/* Métodos de pago */}
         <div className="bg-white p-4 rounded shadow">
           <h3 className="font-semibold mb-4">Método de pago</h3>
 
           <div className="space-y-2">
-            {["card", "yape", "plin"].map((m) => (
+            {(["card", "yape", "plin"] as const).map((m) => (
               <label key={m} className="flex items-center gap-2">
                 <input
                   type="radio"
                   checked={method === m}
                   onChange={() => {
-                    setMethod(m as "card" | "yape" | "plin");
+                    setMethod(m);
                     setQrUrl(null);
-                    setSuccess(false);
                   }}
                 />
                 {m === "card"
-                  ? "Tarjeta de crédito / débito"
+                  ? "Tarjeta (Visa/Mastercard)"
                   : m === "yape"
                   ? "Yape (QR)"
                   : "Plin (QR)"}
@@ -121,17 +160,17 @@ export default function CheckoutPage() {
 
           {qrUrl && (
             <div className="mt-4 text-center">
-              <p className="mb-2 font-medium text-gray-700">
-                Escanea este código para pagar con {method.toUpperCase()}:
+              <p className="font-medium mb-2">
+                Escanea para pagar con {method.toUpperCase()}
               </p>
-              <img
+
+              <Image
                 src={qrUrl}
-                alt={`QR ${method}`}
-                className="mx-auto border p-2 rounded-lg shadow-md"
+                alt="QR pago"
+                width={240}
+                height={240}
+                className="mx-auto border p-2 rounded shadow"
               />
-              <p className="text-gray-500 text-sm mt-2">
-                Esperando confirmación...
-              </p>
             </div>
           )}
 
@@ -141,7 +180,13 @@ export default function CheckoutPage() {
               onClick={handlePayment}
               className="mt-6 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
             >
-              {loading ? "Procesando..." : "Pagar ahora"}
+              {loading
+                ? "Procesando..."
+                : method === "card"
+                ? "Pagar con tarjeta"
+                : method === "yape"
+                ? "Generar QR Yape"
+                : "Generar QR Plin"}
             </button>
           )}
         </div>
