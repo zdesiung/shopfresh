@@ -12,7 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { Button } from "@/components/ui/ButtonTemp";
+import { Button } from "@/components/ui/Button";
 import {
   FaWhatsapp,
   FaFacebookF,
