@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
-import { Button } from "./Button";
+import { Button } from "./ButtonTemp";
 
 // ✅ Tipado estricto para las props
 interface ProductCardProps {
