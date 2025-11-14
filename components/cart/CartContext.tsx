@@ -11,7 +11,7 @@ export interface CartItem {
   quantity: number;
 }
 
-// 🧠 Tipo de datos que manejará el contexto
+// 🧠 Tipo que manejará el contexto
 interface CartContextType {
   items: CartItem[];
   addToCart: (item: CartItem) => void;
@@ -21,25 +21,25 @@ interface CartContextType {
   totalPrice: number;
 }
 
-// 🧰 Crear el contexto
+// 🔧 Crear contexto
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// 🧾 Provider global del carrito
+// 🧾 Provider global
 export default function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
 
-  // 🧠 Cargar carrito desde localStorage
+  // Cargar desde localStorage
   useEffect(() => {
     const saved = localStorage.getItem("cart_items");
     if (saved) setItems(JSON.parse(saved));
   }, []);
 
-  // 💾 Guardar carrito en localStorage cuando cambie
+  // Guardar en localStorage
   useEffect(() => {
     localStorage.setItem("cart_items", JSON.stringify(items));
   }, [items]);
 
-  // ➕ Agregar producto
+  // ➕ Agregar
   const addToCart = (item: CartItem) => {
     setItems((prev) => {
       const existing = prev.find((p) => p.id === item.id);
@@ -52,7 +52,7 @@ export default function CartProvider({ children }: { children: React.ReactNode }
     });
   };
 
-  // ❌ Eliminar producto
+  // ❌ Eliminar
   const removeFromCart = (id: string) => {
     setItems((prev) => prev.filter((item) => item.id !== id));
   };
@@ -66,14 +66,21 @@ export default function CartProvider({ children }: { children: React.ReactNode }
 
   return (
     <CartContext.Provider
-      value={{ items, addToCart, removeFromCart, clearCart, totalItems, totalPrice }}
+      value={{
+        items,
+        addToCart,
+        removeFromCart,
+        clearCart,
+        totalItems,
+        totalPrice,
+      }}
     >
       {children}
     </CartContext.Provider>
   );
 }
 
-// 🪄 Hook para usar el carrito en cualquier componente
+// 🔥 Hook global
 export const useCart = () => {
   const ctx = useContext(CartContext);
   if (!ctx) throw new Error("useCart debe usarse dentro de CartProvider");

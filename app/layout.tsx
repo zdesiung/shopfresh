@@ -6,6 +6,8 @@ import "./globals.css";
 import Navbar from "@/components/ui/Navbar";
 import Footer from "@/components/ui/Footer";
 import ChatbotAI from "@/components/chatbot/chatbotAI";
+
+// 🛒 Carrito (ruta corregida — AJÚSTALA si tu archivo está en /ui/)
 import CartProvider from "@/components/cart/CartContext";
 
 // 🪶 Fuentes locales optimizadas
@@ -21,7 +23,7 @@ const geistMono = localFont({
   display: "swap",
 });
 
-// 🧠 Metadatos SEO (mejorados)
+// 🧠 Metadatos SEO
 export const metadata: Metadata = {
   title: {
     default: "Fresh Design Store | Moda & Estilo",
@@ -82,6 +84,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 text-gray-900 min-h-screen flex flex-col`}
       >
+        {/* 🛒 Provider global del carrito */}
         <CartProvider>
           <Navbar />
           <main className="flex-grow">{children}</main>

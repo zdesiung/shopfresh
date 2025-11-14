@@ -5,7 +5,8 @@ import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 
 export default function CarritoPage() {
-  const { cart, removeFromCart, totalPrice, clearCart } = useCart();
+  // 🟢 items ES TU "cart"
+  const { items: cart, removeFromCart, totalPrice, clearCart } = useCart();
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-20">
@@ -20,7 +21,7 @@ export default function CarritoPage() {
               <div key={item.id} className="flex items-center justify-between border-b pb-4">
                 <div className="flex items-center space-x-4">
                   <Image
-                    src={item.image}
+                    src={item.image ?? "/placeholder.png"}
                     alt={item.name}
                     width={80}
                     height={80}
@@ -33,6 +34,7 @@ export default function CarritoPage() {
                     </p>
                   </div>
                 </div>
+
                 <Button variant="destructive" onClick={() => removeFromCart(item.id)}>
                   Eliminar
                 </Button>
@@ -42,9 +44,11 @@ export default function CarritoPage() {
 
           <div className="mt-10 text-right">
             <p className="text-xl font-semibold mb-4">Total: ${totalPrice.toFixed(2)}</p>
+
             <Button onClick={clearCart} variant="outline" className="mr-3">
               Vaciar Carrito
             </Button>
+
             <Button className="bg-blue-600 text-white hover:bg-blue-700">
               Finalizar Compra
             </Button>

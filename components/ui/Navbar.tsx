@@ -1,12 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image"; // ✅ Import necesario
+import Image from "next/image";
 import { useState } from "react";
 import { AiOutlineMenu, AiOutlineClose, AiOutlineShoppingCart } from "react-icons/ai";
 
+// 🛒 Importar contexto REAL del carrito
+import { useCart } from "@/components/cart/CartContext";
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+
+  // 🛒 Obtener cantidad de productos
+  const { totalItems } = useCart();
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -18,7 +24,7 @@ const Navbar = () => {
           {/* 🔹 LOGO */}
           <Link href="/" className="flex items-center space-x-2">
             <Image
-              src="/images/logo.png" // ✅ Ruta correcta dentro de /public/images/
+              src="/images/logo.png"
               width={40}
               height={40}
               alt="Logo FreshDesign"
@@ -30,7 +36,7 @@ const Navbar = () => {
           {/* 🔹 MENU DESKTOP */}
           <div className="hidden md:flex space-x-8">
             <Link href="/" className="text-gray-700 dark:text-gray-200 hover:text-blue-600">
-            Tienda
+              Tienda
             </Link>
             <Link href="/productos" className="text-gray-700 dark:text-gray-200 hover:text-blue-600">
               Productos
@@ -44,9 +50,13 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             <Link href="/carrito" className="relative">
               <AiOutlineShoppingCart size={24} className="text-gray-700 dark:text-gray-200" />
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold px-1.5 py-0.5 rounded-full">
-                2
-              </span>
+
+              {/* 🔥 Badge del carrito SOLO si hay items */}
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold px-1.5 py-0.5 rounded-full">
+                  {totalItems}
+                </span>
+              )}
             </Link>
 
             {/* 🔹 BOTÓN MENÚ MÓVIL */}
@@ -65,32 +75,16 @@ const Navbar = () => {
       {isOpen && (
         <div className="md:hidden bg-white dark:bg-gray-900 shadow-lg border-t border-gray-200 dark:border-gray-700">
           <div className="px-4 py-3 space-y-2">
-            <Link
-              href="/"
-              className="block text-gray-800 dark:text-gray-200 hover:text-blue-600"
-              onClick={toggleMenu}
-            >
+            <Link href="/" className="block text-gray-800 dark:text-gray-200 hover:text-blue-600" onClick={toggleMenu}>
               Inicio
             </Link>
-            <Link
-              href="/productos"
-              className="block text-gray-800 dark:text-gray-200 hover:text-blue-600"
-              onClick={toggleMenu}
-            >
+            <Link href="/productos" className="block text-gray-800 dark:text-gray-200 hover:text-blue-600" onClick={toggleMenu}>
               Productos
             </Link>
-            <Link
-              href="/ofertas"
-              className="block text-gray-800 dark:text-gray-200 hover:text-blue-600"
-              onClick={toggleMenu}
-            >
+            <Link href="/ofertas" className="block text-gray-800 dark:text-gray-200 hover:text-blue-600" onClick={toggleMenu}>
               Ofertas
             </Link>
-            <Link
-              href="/contacto"
-              className="block text-gray-800 dark:text-gray-200 hover:text-blue-600"
-              onClick={toggleMenu}
-            >
+            <Link href="/contacto" className="block text-gray-800 dark:text-gray-200 hover:text-blue-600" onClick={toggleMenu}>
               Contacto
             </Link>
           </div>
