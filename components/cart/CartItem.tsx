@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useContext } from "react";
+import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Trash2, Plus, Minus } from "lucide-react";
 import { useCart } from "@/components/cart/CartContext";
-
 
 interface CartItemProps {
   id: string;
@@ -22,10 +21,11 @@ export default function CartItem({
   price,
   quantity,
 }: CartItemProps) {
-  const { removeFromCart, updateQuantity } = useContext(CartContext);
+  const { removeFromCart, updateQuantity } = useCart();
 
   const handleIncrease = () => updateQuantity(id, quantity + 1);
-  const handleDecrease = () => updateQuantity(id, quantity - 1);
+  const handleDecrease = () =>
+    quantity > 1 ? updateQuantity(id, quantity - 1) : null;
   const handleRemove = () => removeFromCart(id);
 
   return (

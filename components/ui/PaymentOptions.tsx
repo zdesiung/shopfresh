@@ -80,5 +80,4 @@ export default function PaymentOptions() {
       </motion.div>
     </motion.div>
   );
-}
-clear;
+};

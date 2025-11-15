@@ -5,8 +5,17 @@ import Image from "next/image";
 import { useCart } from "@/components/cart/CartContext";
 import { generateQRCode } from "../lib/payments";
 
+// Declarar global Culqi para TypeScript
+declare global {
+  interface Window {
+    Culqi?: any;
+    culqi?: () => void;
+  }
+  var Culqi: any;
+}
+
 const paymentMethods = ["card", "yape", "plin"] as const;
-type PaymentMethod = typeof paymentMethods[number];
+type PaymentMethod = (typeof paymentMethods)[number];
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
@@ -15,23 +24,20 @@ export default function CheckoutPage() {
   const [success, setSuccess] = useState(false);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
 
-  // Inicializar Culqi
+  // Inicializar Culqi Public Key
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      // @ts-ignore
-      window.Culqi.publicKey = process.env.NEXT_PUBLIC_CULQI_PUBLIC_KEY;
+    if (typeof window !== "undefined" && window.Culqi) {
+      window.Culqi.publicKey = process.env.NEXT_PUBLIC_CULQI_PUBLIC_KEY || "";
     }
   }, []);
 
   // Callback de Culqi
   useEffect(() => {
     if (typeof window !== "undefined") {
-      // @ts-ignore
       window.culqi = async () => {
-        // @ts-ignore
-        if (Culqi.token) {
-          const token = Culqi.token.id;
-          const email = Culqi.token.email;
+        if (window.Culqi?.token) {
+          const token: string = window.Culqi.token.id;
+          const email: string = window.Culqi.token.email;
 
           const res = await fetch("/api/culqi", {
             method: "POST",
@@ -43,7 +49,11 @@ export default function CheckoutPage() {
             }),
           });
 
-          const data = await res.json();
+          const data: {
+            success: boolean;
+            message?: string;
+            charge?: unknown;
+          } = await res.json();
 
           if (data.success && data.charge) {
             setSuccess(true);
@@ -62,30 +72,31 @@ export default function CheckoutPage() {
 
     try {
       if (method === "card") {
-        // @ts-ignore
-        Culqi.settings({
-          title: "Lutex VTop",
-          currency: "PEN",
-          description: "Pago de compra",
-          amount: Math.round(totalPrice * 100),
-        });
+        if (window.Culqi) {
+          window.Culqi.settings({
+            title: "Lutex VTop",
+            currency: "PEN",
+            description: "Pago de compra",
+            amount: Math.round(totalPrice * 100),
+          });
 
-        // @ts-ignore
-        Culqi.open();
-        return;
+          window.Culqi.open();
+          return;
+        }
       }
 
+      // Método QR
       const qr = generateQRCode(method, totalPrice);
       setQrUrl(qr);
-    } catch (error) {
-      console.error("Error procesando pago:", error);
+    } catch (err) {
+      console.error("Error procesando pago:", err);
       alert("Error procesando pago");
     } finally {
       setLoading(false);
     }
   };
 
-  if (!items || items.length === 0) {
+  if (!items?.length) {
     return (
       <div className="p-8 text-center">
         <h2 className="text-2xl font-bold mb-4">🛒 Tu carrito está vacío</h2>
